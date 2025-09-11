@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
-import ErrorReporter from "@/components/ErrorReporter";
 import Script from "next/script";
 import { PackageProvider } from "@/contexts/PackageContext";
 import { Inter } from "next/font/google";
@@ -138,7 +136,6 @@ export default function RootLayout({
         className="antialiased font-sans"
         suppressHydrationWarning={true}
       >
-        <ErrorReporter />
         <Script
           src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/scripts//route-messenger.js"
           strategy="afterInteractive"
@@ -152,7 +149,6 @@ export default function RootLayout({
         <PackageProvider>
           {children}
         </PackageProvider>
-        <VisualEditsMessenger />
       </body>
     </html>
   );
