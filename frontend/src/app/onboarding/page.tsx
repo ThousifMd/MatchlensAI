@@ -12,7 +12,6 @@ import { Progress } from "@/components/ui/progress";
 
 import { CheckCircle2, User, Users, Dumbbell, Plane, UtensilsCrossed, Camera, Music, BookOpen, Gamepad2, Heart, Coffee, Mountain, Upload, X, Check, Smartphone, FileText, TrendingUp, Mail, Phone, Clock } from "lucide-react";
 import { trackInitiateCheckout, trackCompleteRegistration, trackFormStep } from "@/lib/metaPixel";
-import PhotoGuidelinesModal from "@/components/PhotoGuidelinesModal";
 
 interface OnboardingData {
   name: string;
