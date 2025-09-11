@@ -1,0 +1,36 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cursorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4ae36;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffd88a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e7ff3a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d4ae36;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="60" fill="#000000"/>
+  
+  <!-- Matchboost text with very rounded, bubbly style -->
+  <text x="20" y="40" font-family="'Inter', Arial, sans-serif" font-size="22" font-weight="700" fill="#ffffff" stroke="#d4ae36" stroke-width="3" stroke-linejoin="round" style="letter-spacing: 1px;">
+    matchboost
+  </text>
+  
+  <!-- Cursor icon -->
+  <g transform="translate(160, 15)">
+    <!-- Main cursor arrow with rounded edges -->
+    <path d="M0 0 L0 20 L15 10 Z" fill="url(#cursorGradient)" stroke="#d4ae36" stroke-width="1" stroke-linejoin="round"/>
+    
+    <!-- Sparkle effects around cursor -->
+    <g opacity="0.9">
+      <!-- Top sparkle -->
+      <circle cx="8" cy="2" r="2" fill="url(#sparkleGradient)"/>
+      <!-- Right sparkle -->
+      <circle cx="22" cy="10" r="2" fill="url(#sparkleGradient)"/>
+      <!-- Bottom sparkle -->
+      <circle cx="8" cy="22" r="2" fill="url(#sparkleGradient)"/>
+    </g>
+  </g>
+</svg>

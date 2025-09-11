@@ -1,0 +1,15 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Slack hashtag symbol -->
+  <g transform="translate(5, 8)">
+    <!-- Top-left teal -->
+    <rect x="0" y="0" width="8" height="8" rx="1.5" fill="#36C5F0"/>
+    <!-- Top-right green -->
+    <rect x="10" y="0" width="8" height="8" rx="1.5" fill="#2EB67D"/>
+    <!-- Bottom-left pink -->
+    <rect x="0" y="10" width="8" height="8" rx="1.5" fill="#E01E5A"/>
+    <!-- Bottom-right yellow -->
+    <rect x="10" y="10" width="8" height="8" rx="1.5" fill="#ECB22E"/>
+  </g>
+  <!-- Slack text -->
+  <text x="35" y="28" font-family="'Slack-Lato', Arial, sans-serif" font-size="18" font-weight="bold" fill="white">slack</text>
+</svg>

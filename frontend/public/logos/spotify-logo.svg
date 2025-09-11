@@ -1,0 +1,8 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Spotify symbol -->
+  <g transform="translate(5, 8)">
+    <circle cx="8" cy="8" r="6" fill="#1DB954"/>
+    <path d="M5 6 L11 6 M5 8 L11 8 M5 10 L9 10" stroke="white" stroke-width="1"/>
+  </g>
+  <text x="25" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">Spotify</text>
+</svg>

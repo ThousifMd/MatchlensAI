@@ -1,0 +1,7 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Apple logo symbol -->
+  <g transform="translate(5, 8)">
+    <path d="M8 2 C10 2, 12 4, 12 6 C12 8, 10 10, 8 10 C6 10, 4 8, 4 6 C4 4, 6 2, 8 2 Z M8 4 C9 4, 10 5, 10 6 C10 7, 9 8, 8 8 C7 8, 6 7, 6 6 C6 5, 7 4, 8 4 Z" fill="white"/>
+  </g>
+  <text x="25" y="28" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">Apple</text>
+</svg>

@@ -1,0 +1,9 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Figma symbol -->
+  <g transform="translate(5, 8)">
+    <circle cx="8" cy="8" r="6" fill="#F24E1E"/>
+    <circle cx="8" cy="8" r="4" fill="white"/>
+    <circle cx="8" cy="8" r="2" fill="#F24E1E"/>
+  </g>
+  <text x="25" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">Figma</text>
+</svg>

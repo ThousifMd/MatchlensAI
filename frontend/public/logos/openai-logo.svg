@@ -1,0 +1,12 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- OpenAI geometric knot symbol -->
+  <g transform="translate(5, 8)">
+    <path d="M8 2 C10 2, 12 4, 12 6 C12 8, 10 10, 8 10 C6 10, 4 8, 4 6 C4 4, 6 2, 8 2 Z M8 4 C9 4, 10 5, 10 6 C10 7, 9 8, 8 8 C7 8, 6 7, 6 6 C6 5, 7 4, 8 4 Z" fill="white" opacity="0.9"/>
+    <path d="M6 4 C8 4, 10 6, 10 8 C10 10, 8 12, 6 12 C4 12, 2 10, 2 8 C2 6, 4 4, 6 4 Z M6 6 C7 6, 8 7, 8 8 C8 9, 7 10, 6 10 C5 10, 4 9, 4 8 C4 7, 5 6, 6 6 Z" fill="white" opacity="0.7"/>
+    <path d="M4 6 C6 6, 8 8, 8 10 C8 12, 6 14, 4 14 C2 14, 0 12, 0 10 C0 8, 2 6, 4 6 Z M4 8 C5 8, 6 9, 6 10 C6 11, 5 12, 4 12 C3 12, 2 11, 2 10 C2 9, 3 8, 4 8 Z" fill="white" opacity="0.5"/>
+  </g>
+  <!-- OpenAI text -->
+  <text x="30" y="28" font-family="'Inter', Arial, sans-serif" font-size="16" font-weight="400" fill="white">
+    <tspan font-weight="400">Open</tspan><tspan font-weight="bold">AI</tspan>
+  </text>
+</svg>
