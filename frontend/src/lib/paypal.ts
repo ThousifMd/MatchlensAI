@@ -18,7 +18,10 @@ export async function getAccessToken(): Promise<string> {
     console.log('  Using SANDBOX credentials for testing');
     console.log('  SANDBOX_PAYPAL_CLIENT_ID exists:', !!clientId);
     console.log('  SANDBOX_PAYPAL_SECRET_KEY exists:', !!clientSecret);
+    console.log('  SANDBOX_PAYPAL_CLIENT_ID value (first 10 chars):', clientId ? clientId.substring(0, 10) + '...' : 'undefined');
+    console.log('  SANDBOX_PAYPAL_SECRET_KEY value (first 10 chars):', clientSecret ? clientSecret.substring(0, 10) + '...' : 'undefined');
     console.log('  API Base:', PAYPAL_API_BASE);
+    console.log('  All env vars starting with SANDBOX:', Object.keys(process.env).filter(key => key.startsWith('SANDBOX')));
 
     if (!clientId || !clientSecret) {
         const missingCreds = [];
