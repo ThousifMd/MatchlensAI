@@ -1,79 +1,49 @@
-// app/api/paypal/create-order/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { getAccessToken, PAYPAL_API_BASE } from "@/lib/paypal";
+// lib/paypal.ts
+// Single source of truth for env + base URL, with safe fallbacks.
 
-export const runtime = "nodejs";
+const FALLBACK_BASE = "https://api-m.sandbox.paypal.com"; // default to sandbox
 
-export async function GET() {
-    return NextResponse.json(
-        {
-            message: "This endpoint only accepts POST requests",
-            method: "GET not allowed",
-            correctMethod: "POST",
-        },
-        { status: 405 }
-    );
-}
+export const PAYPAL_API_BASE =
+    process.env.PAYPAL_API_BASE?.trim() || FALLBACK_BASE;
 
-export async function POST(req: NextRequest) {
-    try {
-        const body = await req.json();
-        const { amount = "1.00", description = "Test Payment", packageId, packageName } = body;
+// Prefer standard names, accept older aliases if they slip in.
+const CLIENT_ID =
+    process.env.PAYPAL_CLIENT_ID || process.env.SANDBOX_PAYPAL_CLIENT_ID;
 
-        const accessToken = await getAccessToken();
+const CLIENT_SECRET =
+    process.env.PAYPAL_CLIENT_SECRET ||
+    process.env.PAYPAL_SECRET_KEY ||           // if you briefly used this name
+    process.env.SANDBOX_PAYPAL_SECRET_KEY;
 
-        const orderData = {
-            intent: "CAPTURE",
-            purchase_units: [
-                {
-                    reference_id: `order_${Date.now()}`,
-                    description,
-                    custom_id: packageId || "package",
-                    amount: { currency_code: "USD", value: String(amount) },
-                },
-            ],
-            application_context: {
-                shipping_preference: "NO_SHIPPING",
-                user_action: "PAY_NOW",
-                return_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/onboarding/success`,
-                cancel_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"}/checkout`,
-            },
-        };
-
-        const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
-                "PayPal-Request-Id": `create_order_${Date.now()}`,
-            },
-            body: JSON.stringify(orderData),
-            cache: "no-store",
-        });
-
-        const order = await orderRes.json();
-
-        if (!orderRes.ok) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: `PayPal order creation failed`,
-                    status: orderRes.status,
-                    error: order,
-                },
-                { status: orderRes.status }
-            );
-        }
-
-        return NextResponse.json({ success: true, order, orderId: order.id });
-    } catch (err) {
-        return NextResponse.json(
-            {
-                success: false,
-                message: "PayPal order creation failed",
-                error: err instanceof Error ? err.message : "Unknown error",
-            },
-            { status: 500 }
+function requireCreds() {
+    if (!CLIENT_ID || !CLIENT_SECRET) {
+        throw new Error(
+            "PayPal credentials missing. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET."
         );
     }
+}
+
+export async function getAccessToken(): Promise<string> {
+    requireCreds();
+
+    const creds = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
+
+    const res = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
+        method: "POST",
+        headers: {
+            Authorization: `Basic ${creds}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: "grant_type=client_credentials",
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`OAuth failed ${res.status} ${res.statusText} ${body.slice(0, 300)}`);
+    }
+
+    const json = await res.json();
+    if (!json?.access_token) throw new Error("OAuth response missing access_token");
+    return json.access_token as string;
 }
