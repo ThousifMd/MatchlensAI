@@ -99,7 +99,6 @@ router.post('/store', async (req, res) => {
     const result = await pool.query(`
       INSERT INTO payments (
         payment_id,
-        user_id,
         order_id,
         amount,
         currency,
@@ -110,11 +109,10 @@ router.post('/store', async (req, res) => {
         status,
         onboarding_data,
         created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
       RETURNING payment_id, order_id, amount, created_at;
     `, [
       paymentUuid,
-      onboardingSubmission ? onboardingSubmission.user_id : null,
       orderId,
       amount,
       currency || 'USD',

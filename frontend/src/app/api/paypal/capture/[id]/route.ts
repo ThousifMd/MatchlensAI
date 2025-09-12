@@ -63,10 +63,14 @@ export async function POST(
         try {
             const paymentData = {
                 orderId: id,
-                captureId: capture.id,
+                paymentId: capture.id, // Backend expects 'paymentId', not 'captureId'
                 status: capture.status,
                 amount: capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value || '0.00',
                 currency: capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code || 'USD',
+                packageId: capture.purchase_units?.[0]?.custom_id || 'test_package',
+                packageName: capture.purchase_units?.[0]?.description || 'Test Package',
+                customerEmail: capture.payer?.email_address || null,
+                customerName: `${capture.payer?.name?.given_name || ''} ${capture.payer?.name?.surname || ''}`.trim() || null,
                 captureTime: new Date().toISOString(),
                 paypalData: capture
             };
