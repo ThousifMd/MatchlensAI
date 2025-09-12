@@ -1,166 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getAccessToken, PAYPAL_API_BASE } from "@/lib/paypal";
+// lib/paypal.ts
+const FALLBACK_BASE = "https://api-m.sandbox.paypal.com"
 
-export const runtime = "nodejs";
+export const PAYPAL_API_BASE =
+    process.env.PAYPAL_API_BASE?.trim() || FALLBACK_BASE
 
-export async function GET(req: NextRequest) {
-    return NextResponse.json({
-        message: "This endpoint only accepts POST requests",
-        method: "GET not allowed",
-        correctMethod: "POST"
-    }, { status: 405 });
+const CLIENT_ID = process.env.PAYPAL_CLIENT_ID
+const CLIENT_SECRET = process.env.PAYPAL_SECRET_KEY   // ← matches your env name
+
+function ensureCreds() {
+    if (!CLIENT_ID || !CLIENT_SECRET) {
+        throw new Error("Set PAYPAL_CLIENT_ID and PAYPAL_SECRET_KEY in your env")
+    }
 }
 
-export async function POST(req: NextRequest) {
-    try {
-        console.log('🔍 PayPal API Route - Request received');
+export async function getAccessToken(): Promise<string> {
+    ensureCreds()
 
-        let requestBody;
-        try {
-            requestBody = await req.json();
-            console.log('📦 Request body:', requestBody);
-        } catch (jsonError) {
-            console.error('❌ Failed to parse request body:', jsonError);
-            return NextResponse.json({
-                success: false,
-                error: "Invalid JSON in request body",
-                message: "Request body must be valid JSON"
-            }, { status: 400 });
-        }
+    const creds = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64")
 
-        const { amount = "1.00", description = "Test Payment", packageId, packageName } = requestBody;
+    const res = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
+        method: "POST",
+        headers: {
+            Authorization: `Basic ${creds}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: "grant_type=client_credentials",
+        cache: "no-store",
+    })
 
-        console.log('🔍 Creating PayPal order:', { amount, description, packageId, packageName });
-
-        // Debug environment variables
-        console.log('🔧 Environment check:');
-        console.log('  NODE_ENV:', process.env.NODE_ENV);
-        console.log('  Using SANDBOX credentials for testing');
-        console.log('  SANDBOX_PAYPAL_CLIENT_ID exists:', !!process.env.SANDBOX_PAYPAL_CLIENT_ID);
-        console.log('  SANDBOX_PAYPAL_SECRET_KEY exists:', !!process.env.SANDBOX_PAYPAL_SECRET_KEY);
-        console.log('  NEXT_PUBLIC_PAYPAL_CLIENT_ID exists:', !!process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID);
-        console.log('  All env vars with SANDBOX:', Object.keys(process.env).filter(key => key.includes('SANDBOX')));
-        console.log('  All env vars with PAYPAL:', Object.keys(process.env).filter(key => key.includes('PAYPAL')));
-
-        // Check if we're using test credentials (only for development)
-        // This allows developers to set SANDBOX_PAYPAL_CLIENT_ID=test for mock responses
-        if (process.env.NODE_ENV === 'development' && process.env.SANDBOX_PAYPAL_CLIENT_ID === 'test') {
-            console.log('🧪 Using test mode - returning mock order (SANDBOX_PAYPAL_CLIENT_ID=test)');
-
-            // Return a mock order for testing
-            const mockOrder = {
-                id: `test_order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                status: 'CREATED',
-                intent: 'CAPTURE',
-                purchase_units: [
-                    {
-                        reference_id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                        description: description,
-                        custom_id: packageId || "test_package",
-                        amount: {
-                            currency_code: "USD",
-                            value: amount.toString(),
-                        },
-                    },
-                ],
-            };
-
-            return NextResponse.json({
-                success: true,
-                order: mockOrder,
-                orderId: mockOrder.id
-            });
-        }
-
-        console.log('🚀 Attempting to get PayPal access token...');
-        let accessToken;
-        try {
-            accessToken = await getAccessToken();
-            console.log('🔑 Access token received:', accessToken ? 'Yes' : 'No');
-            console.log('🔑 Access token length:', accessToken?.length);
-        } catch (tokenError) {
-            console.error('❌ Failed to get PayPal access token:', tokenError);
-            return NextResponse.json({
-                success: false,
-                error: tokenError instanceof Error ? tokenError.message : 'Failed to get access token',
-                message: "PayPal authentication failed"
-            }, { status: 500 });
-        }
-
-        // Create order data
-        const orderData = {
-            intent: "CAPTURE",
-            purchase_units: [
-                {
-                    reference_id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                    description: description,
-                    custom_id: packageId || "test_package",
-                    amount: {
-                        currency_code: "USD",
-                        value: amount.toString(),
-                    },
-                },
-            ],
-            application_context: {
-                shipping_preference: "NO_SHIPPING",
-                user_action: "PAY_NOW",
-                return_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/onboarding/success`,
-                cancel_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/checkout`,
-            },
-        };
-
-        console.log('📡 Creating order with data:', JSON.stringify(orderData, null, 2));
-
-        console.log('📡 Making request to PayPal API...');
-        console.log('  URL:', `${PAYPAL_API_BASE}/v2/checkout/orders`);
-        console.log('  Headers:', {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken?.substring(0, 20)}...`,
-            "PayPal-Request-Id": `create_order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        });
-
-        const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
-                "PayPal-Request-Id": `create_order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            },
-            body: JSON.stringify(orderData),
-        });
-
-        console.log('📊 PayPal API Response:');
-        console.log('  Status:', orderRes.status);
-        console.log('  Status Text:', orderRes.statusText);
-        console.log('  Headers:', Object.fromEntries(orderRes.headers.entries()));
-
-        const order = await orderRes.json();
-        console.log('📄 PayPal API Response Body:', order);
-
-        if (!orderRes.ok) {
-            console.error('❌ PayPal order creation failed:', order);
-            return NextResponse.json({
-                success: false,
-                error: order,
-                message: `PayPal order creation failed: ${orderRes.status} ${orderRes.statusText}`,
-                paypalError: order
-            }, { status: orderRes.status });
-        }
-
-        console.log('✅ PayPal order created successfully:', order.id);
-
-        return NextResponse.json({
-            success: true,
-            order: order,
-            orderId: order.id
-        });
-
-    } catch (error) {
-        console.error('❌ PayPal order creation error:', error);
-        return NextResponse.json({
-            success: false,
-            error: error instanceof Error ? error.message : "Unknown error",
-            message: "PayPal order creation failed"
-        }, { status: 500 });
+    if (!res.ok) {
+        const body = await res.text().catch(() => "")
+        throw new Error(`OAuth failed ${res.status} ${res.statusText} ${body.slice(0, 300)}`)
     }
+
+    const json = await res.json()
+    if (!json?.access_token) throw new Error("OAuth response missing access_token")
+    return json.access_token as string
 }
