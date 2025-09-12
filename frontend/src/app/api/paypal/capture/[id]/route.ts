@@ -12,7 +12,7 @@ export async function POST(
         console.log('🔍 Capturing PayPal order:', id);
 
         // Check if we're using test credentials (only for development)
-        if (process.env.NODE_ENV === 'development' && (process.env.SANDBOX_PAYPAL_CLIENT_ID === 'test' || process.env.SANDBOX_PAYPAL_SECRET_KEY === 'test')) {
+        if (process.env.NODE_ENV === 'development' && process.env.PAYPAL_CLIENT_ID === 'test') {
             console.log('🧪 Using test mode - returning mock capture');
 
             // Return a mock capture for testing
@@ -58,6 +58,39 @@ export async function POST(
         }
 
         console.log('✅ PayPal order captured successfully:', capture.id);
+
+        // Store payment data after successful capture
+        try {
+            const paymentData = {
+                orderId: id,
+                captureId: capture.id,
+                status: capture.status,
+                amount: capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value || '0.00',
+                currency: capture.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code || 'USD',
+                captureTime: new Date().toISOString(),
+                paypalData: capture
+            };
+
+            console.log('💾 Storing payment data:', paymentData);
+
+            // Store payment data via the payments API
+            const storeResponse = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/api/payments/store`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(paymentData),
+            });
+
+            if (storeResponse.ok) {
+                console.log('✅ Payment data stored successfully');
+            } else {
+                console.error('❌ Failed to store payment data:', await storeResponse.text());
+            }
+        } catch (storeError) {
+            console.error('❌ Error storing payment data:', storeError);
+            // Don't fail the capture if storage fails
+        }
 
         return NextResponse.json({
             success: true,

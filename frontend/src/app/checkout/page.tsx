@@ -381,9 +381,9 @@ function CheckoutContent() {
     // Hide success popup after 3 seconds
     setTimeout(() => setShowSuccessPopup(false), 3000);
 
-    // Redirect to concierge page after a short delay
+    // Redirect to onboarding success page after a short delay
     setTimeout(() => {
-      router.push('/concierge');
+      router.push('/onboarding/success');
     }, 2000);
   };
 
@@ -473,7 +473,7 @@ function CheckoutContent() {
               <Button
                 onClick={() => {
                   setShowSuccessPopup(false);
-                  router.push('/concierge');
+                  router.push('/onboarding/success');
                 }}
                 className="flex-1 bg-[#d4ae36] hover:bg-[#c19d2f] text-black font-semibold"
               >
