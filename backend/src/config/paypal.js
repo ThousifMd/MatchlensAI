@@ -3,8 +3,8 @@ require('dotenv').config();
 
 // PayPal configuration
 const mode = process.env.PAYPAL_MODE || 'sandbox';
-const clientId = mode === 'production' ? process.env.LIVE_PAYPAL_CLIENT_ID : process.env.PAYPAL_CLIENT_ID;
-const clientSecret = mode === 'production' ? process.env.LIVE_PAYPAL_CLIENT_SECRET : process.env.PAYPAL_SECRET_KEY;
+const clientId = (mode === 'production' || mode === 'live') ? process.env.LIVE_PAYPAL_CLIENT_ID : process.env.PAYPAL_CLIENT_ID;
+const clientSecret = (mode === 'production' || mode === 'live') ? process.env.LIVE_PAYPAL_CLIENT_SECRET : process.env.PAYPAL_SECRET_KEY;
 
 // Validate PayPal configuration
 if (!clientId || !clientSecret) {
@@ -21,9 +21,9 @@ console.log('🔧 PayPal Config:', {
 
 // Configure PayPal environment
 let environment;
-const apiBase = process.env.PAYPAL_API_BASE || (mode === 'production' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com');
+const apiBase = process.env.PAYPAL_API_BASE || ((mode === 'production' || mode === 'live') ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com');
 
-if (mode === 'production') {
+if (mode === 'production' || mode === 'live') {
     environment = new paypal.core.LiveEnvironment(clientId, clientSecret);
 } else {
     environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
