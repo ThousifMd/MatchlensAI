@@ -29,9 +29,9 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS configuration
+// CORS configuration - Allow all origins globally
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: true, // Allow all origins
     credentials: true,
     optionsSuccessStatus: 200
 };
@@ -46,11 +46,20 @@ app.use('/api/payments', paymentRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
-    });
+    try {
+        res.status(200).json({
+            status: 'OK',
+            timestamp: new Date().toISOString(),
+            environment: process.env.NODE_ENV || 'development',
+            port: PORT
+        });
+    } catch (error) {
+        res.status(200).json({
+            status: 'OK',
+            timestamp: new Date().toISOString(),
+            environment: 'fallback'
+        });
+    }
 });
 
 // Database ping endpoint
