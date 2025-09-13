@@ -35,16 +35,12 @@ const faqData: FAQItem[] = [
         answer: "AI handles initial enhancements. Human experts review and perfect everything before delivery."
     },
     {
-        question: "Does this work for [Tinder/Bumble/Hinge]?",
+        question: "Does this work for LinkedIn / Instagram / Tinder / Bumble?",
         answer: "Yes. We optimize for all major dating apps. Each has slightly different strategies we account for."
     },
     {
         question: "I'm not photogenic. Will this work?",
         answer: "Being 'not photogenic' usually means bad angles and lighting. We fix both. Everyone looks good with the right optimization."
-    },
-    {
-        question: "What if women find out?",
-        answer: "Find out what? That you put effort into your dating profile? That's attractive, not embarrassing. No one can ever find out that photos are AI generated (This is our secret sauce)."
     },
     {
         question: "Why can't I just use a headshot generator and ChatGPT for my bio?",

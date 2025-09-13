@@ -47,10 +47,6 @@ const DatingAppCard: React.FC<DatingAppCardProps> = ({
 
     return (
         <div className="flex flex-col items-center">
-            {/* App Label */}
-            <div className="mb-4">
-                <span className="text-white/60 text-sm font-medium">{appName}</span>
-            </div>
 
             {/* Mobile Phone Frame */}
             <div className="relative w-80 h-[600px] bg-black rounded-[2.5rem] p-1 shadow-2xl border border-gray-300/20">
@@ -117,10 +113,10 @@ export const DatingAppContext: React.FC = () => {
             <div className="container">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
-                        The Swipe Revolution
+                        The Profile Revolution
                     </h2>
                     <p className="text-xl text-white max-w-2xl mx-auto">
-                        <span className="text-gray-400">Look average</span> → <span className="text-red-400">get ignored</span>. <span className="text-[#d4ae36]">Look like high-status</span> → <span className="text-green-400">get matches</span>. <span className="text-white/80">Same person, different results.</span>
+                        <span className="text-gray-400">Look average</span> → <span className="text-red-400">get ignored</span>. <span className="text-[#d4ae36]">Look polished & high-status</span> → <span className="text-green-400">get noticed</span>. <span className="text-white/80">Same person, different results.</span>
                     </p>
                 </div>
 

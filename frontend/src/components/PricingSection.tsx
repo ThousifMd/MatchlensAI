@@ -23,18 +23,18 @@ const pricingTiers = [
       "Basic bio tips",
       "Private and secure"
     ],
-    buttonText: "Make me a match magnet",
+    buttonText: "Make my profile irresistible",
     popular: false,
     mobileOrder: 2
   },
   {
     id: "most-matches",
-    name: "Most Matches",
+    name: "Most Attention",
     price: 69,
     originalPrice: 199,
     discount: "Most Popular",
     description: "Most popular choice",
-    benefit: "Our proven package that triples your matches fast.",
+    benefit: "Our proven package that triples your responses fast.",
     features: [
       "10 enhanced photos",
       "6 style variations",
@@ -42,7 +42,7 @@ const pricingTiers = [
       "Profile strategy guide",
       "Private and secure"
     ],
-    buttonText: "Make me a match magnet",
+    buttonText: "Make my profile irresistible",
     popular: true,
     mobileOrder: 1
   },
@@ -62,7 +62,7 @@ const pricingTiers = [
       "Message templates",
       "Private and secure"
     ],
-    buttonText: "Make me a match magnet",
+    buttonText: "Make my profile irresistible",
     popular: false,
     mobileOrder: 3
   }
@@ -119,15 +119,22 @@ export const PricingSection = () => {
                   Why spend <span className="text-red-400 font-bold line-through">$400+</span> on headshots and bio coaching?
                 </p>
                 <p className="text-lg sm:text-xl text-gray-300 leading-relaxed mb-6">
-                  For a fraction of that, we'll transform your profile into a <span className="text-[#FFD700] font-bold">swipe-magnet</span>.
+                  For a fraction of that, we'll transform your online presence into a <span className="text-[#FFD700] font-bold">magnetic profile</span>.
                 </p>
-                <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 bg-gradient-to-r from-[#FFD700]/10 to-[#FFA500]/10 backdrop-blur-sm border border-[#FFD700]/30 rounded-2xl px-6 py-3">
+                <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 bg-gradient-to-r from-[#FFD700]/10 to-[#FFA500]/10 backdrop-blur-sm border border-[#FFD700]/30 rounded-2xl px-6 py-3 mb-4">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                     <span className="text-white font-semibold">Most users see</span>
                   </div>
-                  <span className="text-2xl font-bold text-[#FFD700]">3x more matches</span>
+                  <span className="text-2xl font-bold text-[#FFD700]">3x more attention</span>
                   <span className="text-gray-300">in 7 days</span>
+                </div>
+                <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-sm border border-green-500/30 rounded-2xl px-6 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-white font-semibold">💯 Money-back guarantee</span>
+                  </div>
+                  <span className="text-green-400 font-bold">Contact within 7 days</span>
                 </div>
               </div>
             </div>
@@ -204,7 +211,7 @@ export const PricingSection = () => {
                           window.location.href = "/onboarding";
                         }}
                         className="relative w-full h-auto min-h-[48px] px-8 py-3 rounded-lg font-semibold text-lg bg-white/5 backdrop-blur-md border border-white/20 hover:bg-white/10 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#FFD700]/20 overflow-hidden group mt-auto flex items-center justify-center"
-                        aria-label="Make me a match magnet"
+                        aria-label="Make my profile irresistible"
                       >
                         {/* Glass morphism background with flowing colors */}
                         <div className="absolute inset-0 rounded-lg overflow-hidden">
@@ -227,7 +234,7 @@ export const PricingSection = () => {
                           </div>
                         </div>
 
-                        <span className="relative z-20 text-white font-bold drop-shadow-lg text-sm whitespace-nowrap">Make me a match magnet</span>
+                        <span className="relative z-20 text-white font-bold drop-shadow-lg text-sm whitespace-nowrap">Make my profile irresistible</span>
                       </button>
                     ) : (
                       <Button
@@ -241,7 +248,7 @@ export const PricingSection = () => {
                           }`}
                         size="lg"
                       >
-                        Make me a match magnet
+                        Make my profile irresistible
                       </Button>
                     )}
                   </CardContent>

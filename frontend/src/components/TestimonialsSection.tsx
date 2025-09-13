@@ -373,9 +373,6 @@ export const TestimonialsSection: React.FC = () => {
                         <div className="absolute -top-4 -left-4 w-8 h-8 bg-[#FFD700]/20 rounded-full blur-sm"></div>
                         <div className="absolute -bottom-4 -right-4 w-6 h-6 bg-[#FFA500]/30 rounded-full blur-sm"></div>
                     </h2>
-                    <p className="text-xl text-white/80 max-w-3xl mx-auto">
-                        Discover how our AI-powered profile optimization helped these men transform their dating success
-                    </p>
                 </div>
                 {/* Loading state */}
                 <div className="flex gap-6">
@@ -416,9 +413,6 @@ export const TestimonialsSection: React.FC = () => {
                     <div className="absolute -top-4 -left-4 w-8 h-8 bg-[#FFD700]/20 rounded-full blur-sm"></div>
                     <div className="absolute -bottom-4 -right-4 w-6 h-6 bg-[#FFA500]/30 rounded-full blur-sm"></div>
                 </h2>
-                <p className="text-xl text-white/80 max-w-3xl mx-auto">
-                    Discover how our AI-powered profile optimization helped these men transform their dating success
-                </p>
             </div>
 
             {/* Auto-scrolling Testimonials */}

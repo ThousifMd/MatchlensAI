@@ -5,31 +5,16 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
   Check,
   Brain,
   Wand2,
-  Mail,
-  Twitter,
-  Facebook,
-  Linkedin,
-  MessageSquare
+  Mail
 } from 'lucide-react';
 
 export default function SuccessPage() {
   const router = useRouter();
-  const [submissionId, setSubmissionId] = useState<string>('');
-  const [timeLeft, setTimeLeft] = useState<number>(43200); // 12 hours in seconds
-
-  // Get submission ID from URL params
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('submissionId');
-    if (id) {
-      setSubmissionId(id);
-    }
-  }, []);
+  const [timeLeft, setTimeLeft] = useState<number>(86400); // 24 hours in seconds
 
   // Photo countdown timer
   useEffect(() => {
@@ -49,21 +34,12 @@ export default function SuccessPage() {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const shareMessage = "Just upgraded my dating profile with AI! Getting professional photos in 12 hours ⚡️ #DatingProfileAI";
-  const shareUrl = typeof window !== 'undefined' ? window.location.origin : '';
-
-  const shareLinks = {
-    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage)}&url=${encodeURIComponent(shareUrl)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareMessage)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(shareMessage + ' ' + shareUrl)}`
-  };
 
   const nextSteps = [
     {
       icon: Brain,
-      title: "AI analyzes your photos",
-      description: "Our advanced AI studies your features and style preferences"
+      title: "AI + Human analyzes your photos",
+      description: "Our advanced AI and human experts study your features and style preferences"
     },
     {
       icon: Wand2,
@@ -109,17 +85,6 @@ export default function SuccessPage() {
               Your Transformation Has Begun!
             </motion.h1>
 
-            {/* Order Number */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="mb-8"
-            >
-              <Badge variant="secondary" className="text-lg px-4 py-2 bg-[#d4ae36]/10 text-[#d4ae36] border-[#d4ae36]/20">
-                Submission ID: {submissionId}
-              </Badge>
-            </motion.div>
 
             {/* Countdown Timer */}
             <motion.div
@@ -169,57 +134,6 @@ export default function SuccessPage() {
               </div>
             </motion.div>
 
-            {/* Share Incentive */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.9 }}
-              className="mb-8 p-6 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl text-white"
-            >
-              <h3 className="text-xl font-bold mb-2">Share and get 5 bonus photos</h3>
-              <p className="text-[#d4ae36]/80 mb-4">
-                Tell your friends about your AI photo upgrade!
-              </p>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                  onClick={() => window.open(shareLinks.twitter, '_blank')}
-                >
-                  <Twitter className="w-4 h-4 mr-2" />
-                  Twitter
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                  onClick={() => window.open(shareLinks.facebook, '_blank')}
-                >
-                  <Facebook className="w-4 h-4 mr-2" />
-                  Facebook
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                  onClick={() => window.open(shareLinks.linkedin, '_blank')}
-                >
-                  <Linkedin className="w-4 h-4 mr-2" />
-                  LinkedIn
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                  onClick={() => window.open(shareLinks.whatsapp, '_blank')}
-                >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  WhatsApp
-                </Button>
-              </div>
-            </motion.div>
 
             {/* Go to Homepage Button */}
             <motion.div

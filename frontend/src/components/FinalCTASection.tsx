@@ -19,7 +19,7 @@ export const FinalCTASection: React.FC = () => {
                 {/* Header */}
                 <div className="text-center">
                     <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-8">
-                        "Don't be invisible. Be the guy women actually swipe right on."
+                        "Don't be invisible. Be the person people actually notice online"
                     </h2>
 
                     {/* CTA Button */}
@@ -27,7 +27,7 @@ export const FinalCTASection: React.FC = () => {
                         type="button"
                         onClick={handleCTAClick}
                         className="relative bg-white/5 backdrop-blur-md border border-white/20 hover:bg-white/10 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#FFD700]/20 overflow-hidden group text-xl font-bold px-12 py-6 rounded-2xl"
-                        aria-label="Make Me A Match Magnet"
+                        aria-label="Upgrade my photos"
                     >
                         {/* Glass morphism background with flowing colors */}
                         <div className="absolute inset-0 rounded-2xl overflow-hidden">
@@ -51,7 +51,7 @@ export const FinalCTASection: React.FC = () => {
                         </div>
 
                         <span className="relative z-20 text-white font-bold drop-shadow-lg">
-                            Make Me A Match Magnet
+                            Upgrade my photos
                         </span>
                     </button>
                 </div>

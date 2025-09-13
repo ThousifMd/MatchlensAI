@@ -73,6 +73,49 @@ export default function SimplePayPalCheckout({ selectedPackage, showNotification
                 }
             }
 
+            // Retrieve photos from window object (stored separately to avoid localStorage quota issues)
+            let originalPhotos: any[] = [];
+            let screenshotPhotos: any[] = [];
+
+            if (typeof window !== 'undefined') {
+                const windowAny = window as any;
+                originalPhotos = windowAny.onboardingPhotos || [];
+                screenshotPhotos = windowAny.onboardingScreenshots || [];
+            }
+
+            console.log('📸 Retrieved photos:', {
+                originalPhotos: originalPhotos.length,
+                screenshotPhotos: screenshotPhotos.length
+            });
+
+            // Convert File objects to base64 for upload
+            const convertFilesToBase64 = async (files: File[]): Promise<string[]> => {
+                const base64Promises = files.map(file => {
+                    return new Promise<string>((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const result = reader.result as string;
+                            // Remove data URL prefix to get just base64
+                            const base64 = result.split(',')[1];
+                            resolve(base64);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                });
+                return Promise.all(base64Promises);
+            };
+
+            // Convert photos to base64
+            const originalPhotosBase64 = await convertFilesToBase64(originalPhotos);
+            const screenshotPhotosBase64 = await convertFilesToBase64(screenshotPhotos);
+
+            // Add photos to form data
+            formDataToUse = {
+                ...formDataToUse,
+                originalPhotos: originalPhotosBase64,
+                screenshotPhotos: screenshotPhotosBase64
+            };
+
             // STEP 1: Store payment data with complete form data
             const paymentData = {
                 orderId: paymentDetails.id,
