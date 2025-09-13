@@ -19,6 +19,9 @@ app.use(helmet());
 // Compression middleware
 app.use(compression());
 
+// Trust proxy for Railway (required for rate limiting behind reverse proxy)
+app.set('trust proxy', 1);
+
 // Rate limiting
 const limiter = rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
