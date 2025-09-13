@@ -36,55 +36,43 @@ interface Package {
 
 const packages: Package[] = [
   {
-    id: "starter",
-    name: "Starter Package",
-    originalPrice: 59,
-    price: 1,
+    id: "get-noticed",
+    name: "Get Noticed",
+    originalPrice: 99,
+    price: 37,
     features: [
-      "20 enhanced photos",
+      "5 enhanced photos",
       "3 style variations",
       "Basic bio tips",
-      "24-hour delivery",
+      "Private and secure"
     ],
   },
   {
-    id: "professional",
-    name: "Professional Package",
-    originalPrice: 99,
-    price: 1,
+    id: "most-matches",
+    name: "Most Attention",
+    originalPrice: 199,
+    price: 69,
     features: [
-      "50 enhanced photos",
+      "10 enhanced photos",
       "6 style variations",
       "Bio optimization",
       "Profile strategy guide",
-      "12-hour delivery",
+      "Private and secure"
     ],
     popular: true,
   },
   {
-    id: "elite",
-    name: "Elite Package",
-    originalPrice: 149,
-    price: 1,
+    id: "date-ready",
+    name: "Complete Makeover",
+    originalPrice: 199,
+    price: 97,
     features: [
-      "100 enhanced photos",
+      "20 enhanced photos",
       "10 style variations",
       "Complete profile makeover",
+      "Bio optimization",
       "Message templates",
-      "Priority 6-hour delivery",
-    ],
-  },
-  {
-    id: "vip",
-    name: "VIP Package",
-    originalPrice: 249,
-    price: 1,
-    features: [
-      "Unlimited photos",
-      "All styles",
-      "1-on-1 consultation",
-      "Weekly updates for 1 month",
-      "2-hour rush delivery",
+      "Private and secure"
     ],
   },
 ];
@@ -355,11 +343,11 @@ function CheckoutContent() {
     } else {
       // Fallback to localStorage (client-side only)
       if (typeof window !== 'undefined') {
-        const packageId = localStorage.getItem('selectedPackage') || "professional";
+        const packageId = localStorage.getItem('selectedPackage') || "most-matches";
         const pkg = packages.find(p => p.id === packageId) || packages[1];
         setSelectedPackageState(pkg);
       } else {
-        // Default to professional package during SSR
+        // Default to most-matches package during SSR
         setSelectedPackageState(packages[1]);
       }
     }

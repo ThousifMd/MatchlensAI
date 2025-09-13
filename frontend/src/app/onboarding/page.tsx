@@ -820,12 +820,12 @@ function OnboardingContent() {
             </CardHeader>
 
             <CardContent className="space-y-8">
-              {/* Tinder Screenshots Upload */}
+              {/* Dating Profile Screenshots Upload */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Smartphone className="h-5 w-5 text-white" />
                   <h3 className="text-lg font-semibold text-white">
-                    Upload Tinder Screenshots
+                    Share your current profile photos
                   </h3>
                   <span className="text-sm text-gray-400">(Optional)</span>
                 </div>

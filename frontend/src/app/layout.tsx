@@ -12,9 +12,9 @@ const inter = Inter({
 
 
 export const metadata: Metadata = {
-  title: "Matchlens AI - Transform Your Dating Profile in 24 Hours | Get 10x More Matches",
-  description: "Stop getting ignored on dating apps. Our AI transforms your photos and bio to make you irresistible. Join 2,847+ people who got 10x more matches. 24-hour delivery guaranteed.",
-  keywords: "dating profile optimization, AI photo enhancement, dating app success, get more matches, profile makeover, dating bio optimization, Tinder success, Bumble optimization",
+  title: "Matchlens AI - Transform Your Profile in 24 Hours | Get 10x More Attention",
+  description: "Transform your profile in 24 hours. Get 10x more attention with AI-powered photo enhancement and bio optimization. Perfect for LinkedIn, Instagram, dating apps, and all social platforms.",
+  keywords: "profile optimization, AI photo enhancement, social media success, get more attention, profile makeover, bio optimization, LinkedIn optimization, Instagram success, professional photos",
   authors: [{ name: "Matchlens AI" }],
   creator: "Matchlens AI",
   publisher: "Matchlens AI",
@@ -24,21 +24,21 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://matchlens.ai",
     siteName: "Matchlens AI",
-    title: "Matchlens AI - Transform Your Dating Profile in 24 Hours | Get 10x More Matches",
-    description: "Stop getting ignored on dating apps. Our AI transforms your photos and bio to make you irresistible. Join 2,847+ people who got 10x more matches. 24-hour delivery guaranteed.",
+    title: "Matchlens AI - Transform Your Profile in 24 Hours | Get 10x More Attention",
+    description: "Transform your profile in 24 hours. Get 10x more attention with AI-powered photo enhancement and bio optimization. Perfect for LinkedIn, Instagram, dating apps, and all social platforms.",
     images: [
       {
         url: "/logos/matchboost-logo.svg",
         width: 1200,
         height: 630,
-        alt: "Matchlens AI - Dating Profile Optimization",
+        alt: "Matchlens AI - Profile Optimization",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Matchlens AI - Transform Your Dating Profile in 24 Hours | Get 10x More Matches",
-    description: "Stop getting ignored on dating apps. Our AI transforms your photos and bio to make you irresistible. Join 2,847+ people who got 10x more matches.",
+    title: "Matchlens AI - Transform Your Profile in 24 Hours | Get 10x More Attention",
+    description: "Transform your profile in 24 hours. Get 10x more attention with AI-powered photo enhancement and bio optimization. Perfect for LinkedIn, Instagram, dating apps, and all social platforms.",
     images: ["/logos/matchboost-logo.svg"],
     creator: "@matchlensai",
   },

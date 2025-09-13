@@ -1,7 +1,7 @@
 {
-    "name": "Matchlens AI - Dating Profile Optimization",
+    "name": "Matchlens AI - Profile Optimization",
     "short_name": "Matchlens AI",
-    "description": "Transform your dating profile in 24 hours. Get 10x more matches with AI-powered photo enhancement and bio optimization.",
+    "description": "Transform your profile in 24 hours. Get 10x more attention with AI-powered photo enhancement and bio optimization.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#000000",
@@ -26,9 +26,9 @@
         }
     ],
     "categories": [
-        "dating",
         "lifestyle",
-        "productivity"
+        "productivity",
+        "social"
     ],
     "lang": "en-US",
     "dir": "ltr"
