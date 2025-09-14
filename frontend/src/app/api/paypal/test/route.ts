@@ -8,12 +8,12 @@ export async function GET(req: NextRequest) {
     console.log('🧪 Testing PayPal API connectivity...');
 
     // Test 1: Check environment variables
-    const clientId = process.env.SANDBOX_PAYPAL_CLIENT_ID;
-    const clientSecret = process.env.SANDBOX_PAYPAL_SECRET_KEY;
+    const clientId = process.env.PAYPAL_CLIENT_ID;
+    const clientSecret = process.env.PAYPAL_SECRET_KEY;
 
     console.log('🔑 Environment Variables:');
-    console.log('- SANDBOX_PAYPAL_CLIENT_ID:', clientId ? 'Present' : 'Missing');
-    console.log('- SANDBOX_PAYPAL_SECRET_KEY:', clientSecret ? 'Present' : 'Missing');
+    console.log('- PAYPAL_CLIENT_ID:', clientId ? 'Present' : 'Missing');
+    console.log('- PAYPAL_SECRET_KEY:', clientSecret ? 'Present' : 'Missing');
     console.log('- PAYPAL_API_BASE:', PAYPAL_API_BASE);
 
     if (!clientId || !clientSecret) {

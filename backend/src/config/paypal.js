@@ -111,7 +111,9 @@ const createOrderData = (amount, description, packageId, packageName, customId =
                 value: amount.toString()
             },
             payee: {
-                email_address: process.env.PAYPAL_MERCHANT_EMAIL || 'merchant@matchlens.ai'
+                email_address: (mode === 'production' || mode === 'live')
+                    ? (process.env.PAYPAL_MERCHANT_EMAIL || 'merchant@matchlens.ai')
+                    : 'test-merchant@example.com' // Sandbox doesn't require real email
             }
         }],
         application_context: {

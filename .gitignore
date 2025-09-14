@@ -60,3 +60,4 @@ next-env.d.ts
 # Database
 *.db
 *.sqlite
+backend/src/setup/createEnv.js
