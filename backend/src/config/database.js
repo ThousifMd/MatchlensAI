@@ -44,12 +44,14 @@ pool.on('error', (err, client) => {
 // Test database connection
 const testConnection = async () => {
     try {
+        console.log('🔄 Attempting database connection...');
         const client = await pool.connect();
         console.log('✅ Database connected successfully');
         client.release();
         return true;
     } catch (error) {
         console.error('❌ Database connection failed:', error.message);
+        console.error('❌ Full error:', error);
         return false;
     }
 };
