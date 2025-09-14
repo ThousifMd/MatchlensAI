@@ -14,6 +14,15 @@ const dbConfig = {
     connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
 };
 
+// Debug: Log all environment variables
+console.log('🔍 Environment Variables Debug:', {
+    'process.env.DB_HOST': process.env.DB_HOST,
+    'process.env.DB_PORT': process.env.DB_PORT,
+    'process.env.DB_NAME': process.env.DB_NAME,
+    'process.env.DB_USER': process.env.DB_USER,
+    'process.env.DB_PASSWORD': process.env.DB_PASSWORD ? '***set***' : 'not set'
+});
+
 // Log database configuration (without password)
 console.log('🔧 Database Config:', {
     host: dbConfig.host,
