@@ -35,6 +35,11 @@ console.log('🔧 Database Config:', {
 // Create connection pool
 const pool = new Pool(dbConfig);
 
+// Monitor connection pool every 10 seconds
+setInterval(() => {
+    console.log(`🔗 Pool stats - Total: ${pool.totalCount}, Idle: ${pool.idleCount}, Waiting: ${pool.waitingCount}`);
+}, 10000);
+
 // Handle pool errors
 pool.on('error', (err, client) => {
     console.error('Unexpected error on idle client', err);
@@ -70,7 +75,9 @@ const query = async (text, params = []) => {
 
 // Get a client from the pool for transactions
 const getClient = async () => {
-    return await pool.connect();
+    const client = await pool.connect();
+    console.log('🔗 Database client acquired. Pool stats - Total:', pool.totalCount, 'Idle:', pool.idleCount);
+    return client;
 };
 
 // Close the pool

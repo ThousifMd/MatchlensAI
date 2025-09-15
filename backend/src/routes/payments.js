@@ -127,7 +127,9 @@ router.post('/store', async (req, res) => {
         console.log('🔗 Screenshot photo URLs:', screenshotPhotoUrls);
 
         // Start transaction - ONLY after payment success and image uploads
-        const client = await require('../config/database').getClient();
+        const { getClient, pool } = require('../config/database');
+        console.log('🔗 Active DB connections:', pool.totalCount, 'Idle:', pool.idleCount);
+        const client = await getClient();
 
         try {
             await client.query('BEGIN');

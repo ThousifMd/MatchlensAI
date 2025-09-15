@@ -155,19 +155,34 @@ app.use('*', (req, res) => {
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
     console.log('🛑 SIGTERM received, shutting down gracefully');
-    process.exit(0);
+    setTimeout(() => {
+        process.exit(0);
+    }, 1000);
 });
 
 process.on('SIGINT', () => {
     console.log('🛑 SIGINT received, shutting down gracefully');
-    process.exit(0);
+    setTimeout(() => {
+        process.exit(0);
+    }, 1000);
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('❌ Uncaught Exception:', error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
 });
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-    console.log(`🔗 Database ping: http://localhost:${PORT}/api/ping-db`);
-    console.log(`🔗 Database test: http://localhost:${PORT}/api/test-db`);
+    console.log(`🔗 Health check: http://0.0.0.0:${PORT}/health`);
+    console.log(`🔗 Database ping: http://0.0.0.0:${PORT}/api/ping-db`);
+    console.log(`🔗 Database test: http://0.0.0.0:${PORT}/api/test-db`);
 });
