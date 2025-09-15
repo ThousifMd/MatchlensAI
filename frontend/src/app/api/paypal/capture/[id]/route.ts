@@ -76,9 +76,9 @@ export async function POST(
             };
 
             console.log('💾 Storing payment data:', paymentData);
-
+            //hardcoded backend url
             // Store payment data via the payments API
-            const storeResponse = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/api/payments/store`, {
+            const storeResponse = await fetch(`https://efficient-cooperation-production-a90a.up.railway.app/api/payments/store`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

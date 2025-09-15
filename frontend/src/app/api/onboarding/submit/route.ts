@@ -6,7 +6,7 @@ async function fileToBase64(file: File): Promise<string> {
     const buffer = Buffer.from(bytes);
     return buffer.toString('base64');
 }
-
+//sdfsfsd
 export async function POST(request: NextRequest) {
     try {
         console.log('📝 ONBOARDING SUBMIT ROUTE CALLED - Processing real form data');
@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
             originalPhotos: submissionData.originalPhotos.length,
             screenshots: submissionData.screenshotPhotos.length
         });
+
 
         // Send to backend API using payments endpoint (since onboarding endpoint doesn't exist)
         const backendUrl = 'https://efficient-cooperation-production-a90a.up.railway.app';
