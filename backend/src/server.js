@@ -165,30 +165,11 @@ app.use('*', (req, res) => {
     });
 });
 
-// Start server with database connection test
-const startServer = async () => {
-    try {
-        // Test database connection first
-        console.log('🔄 Testing database connection...');
-        const dbConnected = await testConnection();
-
-        if (!dbConnected) {
-            console.error('❌ Database connection failed, but starting server anyway...');
-        }
-
-        // Start the server
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-            console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-            console.log(`🔗 Database ping: http://localhost:${PORT}/api/ping-db`);
-            console.log(`🔗 Database test: http://localhost:${PORT}/api/test-db`);
-        });
-    } catch (error) {
-        console.error('❌ Failed to start server:', error);
-        process.exit(1);
-    }
-};
-
-// Start the server
-startServer();
+// Start server
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+    console.log(`🔗 Database ping: http://localhost:${PORT}/api/ping-db`);
+    console.log(`🔗 Database test: http://localhost:${PORT}/api/test-db`);
+});

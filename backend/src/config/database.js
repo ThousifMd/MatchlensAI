@@ -20,10 +20,7 @@ console.log('🔍 Environment Variables Debug:', {
     'process.env.DB_PORT': process.env.DB_PORT,
     'process.env.DB_NAME': process.env.DB_NAME,
     'process.env.DB_USER': process.env.DB_USER,
-    'process.env.DB_PASSWORD': process.env.DB_PASSWORD ? '***set***' : 'not set',
-    'process.env.CLOUDINARY_CLOUD_NAME': process.env.CLOUDINARY_CLOUD_NAME,
-    'process.env.CLOUDINARY_API_KEY': process.env.CLOUDINARY_API_KEY,
-    'process.env.CLOUDINARY_API_SECRET': process.env.CLOUDINARY_API_SECRET ? '***set***' : 'not set'
+    'process.env.DB_PASSWORD': process.env.DB_PASSWORD ? '***set***' : 'not set'
 });
 
 // Log database configuration (without password)
@@ -47,14 +44,12 @@ pool.on('error', (err, client) => {
 // Test database connection
 const testConnection = async () => {
     try {
-        console.log('🔄 Attempting database connection...');
         const client = await pool.connect();
         console.log('✅ Database connected successfully');
         client.release();
         return true;
     } catch (error) {
         console.error('❌ Database connection failed:', error.message);
-        console.error('❌ Full error:', error);
         return false;
     }
 };
