@@ -1,93 +1,22 @@
 const { Pool } = require('pg');
 require('dotenv').config({ path: '.env.local' });
 
-// Database connection configuration
-const dbConfig = {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT) || 5432,
-    database: process.env.DB_NAME || 'matchlens_db',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'password',
+// Simple database configuration
+const pool = new Pool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     ssl: process.env.DB_HOST && process.env.DB_HOST.includes('digitalocean') ? { rejectUnauthorized: false } : false,
-    max: 20, // Maximum number of clients in the pool
-    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-    connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
-};
-
-// Debug: Log all environment variables
-console.log('🔍 Environment Variables Debug:', {
-    'process.env.DB_HOST': process.env.DB_HOST,
-    'process.env.DB_PORT': process.env.DB_PORT,
-    'process.env.DB_NAME': process.env.DB_NAME,
-    'process.env.DB_USER': process.env.DB_USER,
-    'process.env.DB_PASSWORD': process.env.DB_PASSWORD ? '***set***' : 'not set'
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
 });
-
-// Log database configuration (without password)
-console.log('🔧 Database Config:', {
-    host: dbConfig.host,
-    port: dbConfig.port,
-    database: dbConfig.database,
-    user: dbConfig.user,
-    password: dbConfig.password ? '***hidden***' : 'not set'
-});
-
-// Create connection pool
-const pool = new Pool(dbConfig);
-
-// Monitor connection pool every 60 seconds (reduced frequency)
-setInterval(() => {
-    if (pool.totalCount > 0) {
-        console.log(`🔗 Pool stats - Total: ${pool.totalCount}, Idle: ${pool.idleCount}, Waiting: ${pool.waitingCount}`);
-    }
-}, 60000);
 
 // Handle pool errors
-pool.on('error', (err, client) => {
-    console.error('Unexpected error on idle client', err);
-    process.exit(-1);
+pool.on('error', (err) => {
+    console.error('Database pool error:', err);
 });
 
-// Test database connection
-const testConnection = async () => {
-    try {
-        const client = await pool.connect();
-        console.log('✅ Database connected successfully');
-        client.release();
-        return true;
-    } catch (error) {
-        console.error('❌ Database connection failed:', error.message);
-        return false;
-    }
-};
-
-// Execute query with error handling
-const query = async (text, params = []) => {
-    try {
-        const res = await pool.query(text, params);
-        return res;
-    } catch (error) {
-        console.error('Database query error:', error);
-        throw error;
-    }
-};
-
-// Get a client from the pool for transactions
-const getClient = async () => {
-    const client = await pool.connect();
-    return client;
-};
-
-// Close the pool
-const closePool = async () => {
-    await pool.end();
-    console.log('Database pool closed');
-};
-
-module.exports = {
-    pool,
-    query,
-    getClient,
-    testConnection,
-    closePool
-};
+module.exports = { pool };
