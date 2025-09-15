@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 
 // Database connection configuration
 const dbConfig = {
@@ -35,10 +35,12 @@ console.log('🔧 Database Config:', {
 // Create connection pool
 const pool = new Pool(dbConfig);
 
-// Monitor connection pool every 10 seconds
+// Monitor connection pool every 60 seconds (reduced frequency)
 setInterval(() => {
-    console.log(`🔗 Pool stats - Total: ${pool.totalCount}, Idle: ${pool.idleCount}, Waiting: ${pool.waitingCount}`);
-}, 10000);
+    if (pool.totalCount > 0) {
+        console.log(`🔗 Pool stats - Total: ${pool.totalCount}, Idle: ${pool.idleCount}, Waiting: ${pool.waitingCount}`);
+    }
+}, 60000);
 
 // Handle pool errors
 pool.on('error', (err, client) => {
@@ -61,11 +63,8 @@ const testConnection = async () => {
 
 // Execute query with error handling
 const query = async (text, params = []) => {
-    const start = Date.now();
     try {
         const res = await pool.query(text, params);
-        const duration = Date.now() - start;
-        console.log('Executed query', { text, duration, rows: res.rowCount });
         return res;
     } catch (error) {
         console.error('Database query error:', error);
@@ -76,7 +75,6 @@ const query = async (text, params = []) => {
 // Get a client from the pool for transactions
 const getClient = async () => {
     const client = await pool.connect();
-    console.log('🔗 Database client acquired. Pool stats - Total:', pool.totalCount, 'Idle:', pool.idleCount);
     return client;
 };
 

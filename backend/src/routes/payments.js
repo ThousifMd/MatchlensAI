@@ -64,7 +64,7 @@ const uploadImagesToCloudinary = async (images, folder) => {
 // Store payment and onboarding data - ONLY AFTER PAYMENT SUCCESS
 router.post('/store', async (req, res) => {
     try {
-        console.log('🔄 Payment store request received:', req.body);
+        console.log('🔄 Payment store request received for:', req.body.customerEmail);
 
         const {
             orderId,
@@ -108,10 +108,6 @@ router.post('/store', async (req, res) => {
 
         // Upload images to Cloudinary first
         console.log('📸 Uploading images to Cloudinary...');
-        console.log('🔍 Original photos data:', onboardingData.originalPhotos);
-        console.log('🔍 Screenshot photos data:', onboardingData.screenshotPhotos);
-        console.log('🔍 Original photos type:', typeof onboardingData.originalPhotos, 'Length:', onboardingData.originalPhotos?.length);
-        console.log('🔍 Screenshot photos type:', typeof onboardingData.screenshotPhotos, 'Length:', onboardingData.screenshotPhotos?.length);
 
         const originalPhotoUrls = await uploadImagesToCloudinary(
             onboardingData.originalPhotos || [],
@@ -123,12 +119,9 @@ router.post('/store', async (req, res) => {
         );
 
         console.log(`✅ Uploaded ${originalPhotoUrls.length} original photos and ${screenshotPhotoUrls.length} screenshot photos`);
-        console.log('🔗 Original photo URLs:', originalPhotoUrls);
-        console.log('🔗 Screenshot photo URLs:', screenshotPhotoUrls);
 
         // Start transaction - ONLY after payment success and image uploads
-        const { getClient, pool } = require('../config/database');
-        console.log('🔗 Active DB connections:', pool.totalCount, 'Idle:', pool.idleCount);
+        const { getClient } = require('../config/database');
         const client = await getClient();
 
         try {
