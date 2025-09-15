@@ -49,7 +49,22 @@ app.use('/api/payments', paymentRoutes);
 
 // Health check endpoint - ultra simple
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'OK' });
+    console.log('🏥 Health check requested at:', new Date().toISOString());
+    res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
+// Railway might also check root endpoint
+app.get('/', (req, res) => {
+    console.log('🏠 Root endpoint requested at:', new Date().toISOString());
+    res.status(200).json({
+        message: 'API is running',
+        status: 'healthy',
+        timestamp: new Date().toISOString()
+    });
 });
 
 // Database ping endpoint
@@ -179,10 +194,15 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔗 Health check: http://0.0.0.0:${PORT}/health`);
     console.log(`🔗 Database ping: http://0.0.0.0:${PORT}/api/ping-db`);
     console.log(`🔗 Database test: http://0.0.0.0:${PORT}/api/test-db`);
+
+    // Add a small delay to ensure server is fully ready
+    setTimeout(() => {
+        console.log('✅ Server fully ready and accepting connections');
+    }, 1000);
 });
