@@ -9,106 +9,75 @@ async function fileToBase64(file: File): Promise<string> {
 
 export async function POST(request: NextRequest) {
     try {
-        const formData = await request.formData();
+        console.log('🧪 ONBOARDING SUBMIT ROUTE CALLED - Using mock data for testing');
 
-        // Extract text fields
-        const name = formData.get('name') as string;
-        const age = formData.get('age') as string;
-        const datingGoal = formData.get('datingGoal') as string;
-        const currentMatches = formData.get('currentMatches') as string;
-        const bodyType = formData.get('bodyType') as string;
-        const stylePreference = formData.get('stylePreference') as string;
-        const ethnicity = formData.get('ethnicity') as string;
-        const interests = JSON.parse(formData.get('interests') as string);
-        const currentBio = formData.get('currentBio') as string;
-        const email = formData.get('email') as string;
-        const phone = formData.get('phone') as string;
-        const weeklyTips = formData.get('weeklyTips') === 'true';
-
-        // Handle original photos
-        const originalPhotos = formData.getAll('originalPhotos') as File[];
-        const originalPhotoUrls: string[] = [];
-
-        // Handle screenshot photos
-        const screenshotPhotos = formData.getAll('screenshotPhotos') as File[];
-        const screenshotPhotoUrls: string[] = [];
-
-        // Convert original photos to base64
-        console.log(`Converting ${originalPhotos.length} original photos to base64...`);
-        for (const photo of originalPhotos) {
-            if (photo instanceof File) {
-                try {
-                    const base64Data = await fileToBase64(photo);
-                    originalPhotoUrls.push(base64Data);
-                    console.log(`Converted original photo: ${photo.name}`);
-                } catch (error) {
-                    console.error('Error converting original photo:', error);
-                    throw new Error(`Failed to convert original photo: ${photo.name}`);
-                }
-            }
-        }
-
-        // Convert screenshot photos to base64
-        console.log(`Converting ${screenshotPhotos.length} screenshot photos to base64...`);
-        for (const screenshot of screenshotPhotos) {
-            if (screenshot instanceof File) {
-                try {
-                    const base64Data = await fileToBase64(screenshot);
-                    screenshotPhotoUrls.push(base64Data);
-                    console.log(`Converted screenshot: ${screenshot.name}`);
-                } catch (error) {
-                    console.error('Error converting screenshot:', error);
-                    throw new Error(`Failed to convert screenshot: ${screenshot.name}`);
-                }
-            }
-        }
-
-        // Prepare data for backend
+        // Use mock data instead of form data for testing
         const submissionData = {
-            name,
-            age,
-            datingGoal,
-            currentMatches,
-            bodyType,
-            stylePreference,
-            ethnicity,
-            interests,
-            currentBio,
-            email,
-            phone,
-            weeklyTips,
-            originalPhotos: originalPhotoUrls,
-            screenshotPhotos: screenshotPhotoUrls
+            name: "Mike",
+            age: "25",
+            datingGoal: "casual",
+            currentMatches: "0-2",
+            bodyType: "average",
+            stylePreference: "casual",
+            ethnicity: "other",
+            interests: ["movies", "music"],
+            currentBio: "Mock bio for testing",
+            email: "mock@test.com",
+            phone: "1234567890",
+            weeklyTips: true,
+            originalPhotos: ["iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="],
+            screenshotPhotos: ["iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="]
         };
 
-        // Send to backend API
-        const backendUrl = process.env.BACKEND_URL || 'http://localhost:5001';
-        console.log('Sending data to backend:', backendUrl);
+        console.log('📊 Mock submission data:', submissionData);
 
-        const response = await fetch(`${backendUrl}/api/onboarding/submit`, {
+        // Send to backend API using payments endpoint (since onboarding endpoint doesn't exist)
+        const backendUrl = 'https://efficient-cooperation-production-a90a.up.railway.app';
+        console.log('🔗 Sending mock data to backend:', backendUrl);
+
+        // Create a mock payment request to test the backend
+        const mockPaymentData = {
+            orderId: "mock-onboarding-" + Date.now(),
+            paymentId: "mock-onboarding-" + Date.now(),
+            amount: 1.00,
+            currency: "USD",
+            packageId: "most-matches",
+            packageName: "Most Attention",
+            customerEmail: submissionData.email,
+            customerName: submissionData.name,
+            status: "completed",
+            onboardingData: submissionData
+        };
+
+        console.log('📤 Sending mock payment data:', mockPaymentData);
+
+        const response = await fetch(`${backendUrl}/api/payments/store`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(submissionData),
+            body: JSON.stringify(mockPaymentData),
         });
+
+        console.log('📊 Backend response status:', response.status);
+        console.log('📊 Backend response ok:', response.ok);
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Backend API error:', response.status, errorText);
+            console.error('❌ Backend API error:', response.status, errorText);
             throw new Error(`Backend API error: ${response.status} - ${errorText}`);
         }
 
         const result = await response.json();
-        console.log('Backend response:', result);
+        console.log('✅ Backend response success:', result);
 
         return NextResponse.json({
             success: true,
-            submissionId: result.submissionId,
-            message: 'Onboarding submitted successfully',
-            photoCount: {
-                original: originalPhotoUrls.length,
-                screenshots: screenshotPhotoUrls.length
+            message: 'Mock onboarding data sent to backend successfully',
+            backendResponse: result,
+            mockData: {
+                originalPhotos: submissionData.originalPhotos.length,
+                screenshots: submissionData.screenshotPhotos.length
             }
         });
 
