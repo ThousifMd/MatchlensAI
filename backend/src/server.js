@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Database pool with simplified config
-const pool = null;
+let pool = null;
 try {
     pool = new Pool({
         host: process.env.DB_HOST,
