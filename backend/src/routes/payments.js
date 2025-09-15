@@ -4,6 +4,12 @@ const { query } = require('../config/database');
 const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
+console.log('☁️ Cloudinary Config Debug:', {
+    'cloud_name': process.env.CLOUDINARY_CLOUD_NAME,
+    'api_key': process.env.CLOUDINARY_API_KEY,
+    'api_secret': process.env.CLOUDINARY_API_SECRET ? '***set***' : 'not set'
+});
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,

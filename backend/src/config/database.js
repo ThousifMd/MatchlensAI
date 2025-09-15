@@ -20,7 +20,10 @@ console.log('🔍 Environment Variables Debug:', {
     'process.env.DB_PORT': process.env.DB_PORT,
     'process.env.DB_NAME': process.env.DB_NAME,
     'process.env.DB_USER': process.env.DB_USER,
-    'process.env.DB_PASSWORD': process.env.DB_PASSWORD ? '***set***' : 'not set'
+    'process.env.DB_PASSWORD': process.env.DB_PASSWORD ? '***set***' : 'not set',
+    'process.env.CLOUDINARY_CLOUD_NAME': process.env.CLOUDINARY_CLOUD_NAME,
+    'process.env.CLOUDINARY_API_KEY': process.env.CLOUDINARY_API_KEY,
+    'process.env.CLOUDINARY_API_SECRET': process.env.CLOUDINARY_API_SECRET ? '***set***' : 'not set'
 });
 
 // Log database configuration (without password)
