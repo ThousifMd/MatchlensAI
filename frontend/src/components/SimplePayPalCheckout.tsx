@@ -81,6 +81,13 @@ export default function SimplePayPalCheckout({ selectedPackage, showNotification
                 const windowAny = window as any;
                 originalPhotos = windowAny.onboardingPhotos || [];
                 screenshotPhotos = windowAny.onboardingScreenshots || [];
+
+                console.log('🔍 Window object debug:', {
+                    'window.onboardingPhotos': windowAny.onboardingPhotos,
+                    'window.onboardingScreenshots': windowAny.onboardingScreenshots,
+                    'originalPhotos.length': originalPhotos.length,
+                    'screenshotPhotos.length': screenshotPhotos.length
+                });
             }
 
             console.log('📸 Retrieved photos:', {
