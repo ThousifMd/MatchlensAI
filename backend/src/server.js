@@ -1,17 +1,36 @@
+console.log('🔄 Starting server initialization...');
+
 const express = require('express');
+console.log('✅ Express loaded');
+
 const cors = require('cors');
+console.log('✅ CORS loaded');
+
 const helmet = require('helmet');
+console.log('✅ Helmet loaded');
+
 const compression = require('compression');
+console.log('✅ Compression loaded');
+
 const rateLimit = require('express-rate-limit');
+console.log('✅ Rate limit loaded');
+
 require('dotenv').config();
+console.log('✅ Environment variables loaded');
 
 // const { testConnection } = require('./config/database');
 
 // Import routes
+console.log('🔄 Loading payment routes...');
 const paymentRoutes = require('./routes/payments');
+console.log('✅ Payment routes loaded');
 
+console.log('🔄 Creating Express app...');
 const app = express();
+console.log('✅ Express app created');
+
 const PORT = process.env.PORT || 5001;
+console.log('✅ Port configured:', PORT);
 
 // Security middleware
 app.use(helmet());
