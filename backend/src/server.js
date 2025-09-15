@@ -13,9 +13,10 @@ const pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     ssl: process.env.DB_HOST && process.env.DB_HOST.includes('digitalocean') ? { rejectUnauthorized: false } : false,
-    max: 5,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    max: 2, // Reduced pool size
+    idleTimeoutMillis: 10000, // Reduced timeout
+    connectionTimeoutMillis: 3000, // Reduced timeout
+    acquireTimeoutMillis: 3000, // Add acquire timeout
 });
 
 // Cloudinary configuration
@@ -45,7 +46,7 @@ app.get('/', (req, res) => {
 // Upload images to Cloudinary
 async function uploadImagesToCloudinary(images, folder) {
     const uploadedUrls = [];
-    
+
     if (!images || !Array.isArray(images)) {
         return uploadedUrls;
     }
@@ -86,8 +87,17 @@ async function uploadImagesToCloudinary(images, folder) {
 
 // Store payment and onboarding data
 app.post('/api/payments/store', async (req, res) => {
-    const client = await pool.connect();
-    
+    let client;
+    try {
+        client = await pool.connect();
+    } catch (error) {
+        console.error('Failed to get database client:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Database connection failed'
+        });
+    }
+
     try {
         const {
             orderId,
@@ -122,7 +132,7 @@ app.post('/api/payments/store', async (req, res) => {
             onboardingData.originalPhotos || [],
             'matchlens-onboarding-photos'
         );
-        
+
         const screenshotPhotoUrls = await uploadImagesToCloudinary(
             onboardingData.screenshotPhotos || [],
             'matchlens-onboarding-screenshots'
@@ -246,7 +256,7 @@ app.get('/api/payments/list', async (req, res) => {
 app.get('/api/payments/order/:orderId', async (req, res) => {
     try {
         const { orderId } = req.params;
-        
+
         const result = await pool.query(`
             SELECT 
                 p.payment_id,
@@ -317,17 +327,39 @@ app.use('*', (req, res) => {
     });
 });
 
+// Test database connection on startup
+async function testDatabaseConnection() {
+    try {
+        const client = await pool.connect();
+        await client.query('SELECT 1');
+        client.release();
+        console.log('Database connection successful');
+    } catch (error) {
+        console.error('Database connection failed:', error.message);
+    }
+}
+
 // Start server
-const server = app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', async () => {
     console.log(`Server running on port ${PORT}`);
+    await testDatabaseConnection();
 });
 
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully');
+    
+    // Set a timeout to force exit if graceful shutdown takes too long
+    const forceExit = setTimeout(() => {
+        console.log('Force exiting due to timeout');
+        process.exit(1);
+    }, 10000); // 10 second timeout
+    
     server.close(() => {
+        console.log('HTTP server closed');
         pool.end(() => {
             console.log('Database pool closed');
+            clearTimeout(forceExit);
             process.exit(0);
         });
     });
@@ -335,9 +367,17 @@ process.on('SIGTERM', () => {
 
 process.on('SIGINT', () => {
     console.log('SIGINT received, shutting down gracefully');
+    
+    const forceExit = setTimeout(() => {
+        console.log('Force exiting due to timeout');
+        process.exit(1);
+    }, 10000);
+    
     server.close(() => {
+        console.log('HTTP server closed');
         pool.end(() => {
             console.log('Database pool closed');
+            clearTimeout(forceExit);
             process.exit(0);
         });
     });
