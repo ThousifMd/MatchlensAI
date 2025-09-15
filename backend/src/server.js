@@ -5,144 +5,99 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const cloudinary = require('cloudinary').v2;
 
-// Database configuration
-const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    ssl: process.env.DB_HOST && process.env.DB_HOST.includes('digitalocean') ? { rejectUnauthorized: false } : false,
-    max: 2, // Reduced pool size
-    idleTimeoutMillis: 10000, // Reduced timeout
-    connectionTimeoutMillis: 3000, // Reduced timeout
-    acquireTimeoutMillis: 3000, // Add acquire timeout
-});
+const app = express();
+const PORT = process.env.PORT || 5001;
 
-// Cloudinary configuration
+// Database pool with simplified config
+const pool = null;
+try {
+    pool = new Pool({
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        ssl: process.env.DB_HOST?.includes('digitalocean') ? { rejectUnauthorized: false } : false,
+        max: 5,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+    })
+} catch (error) {
+    console.error('❌ Database connection error:', error);
+    throw error;
+}
+
+// Cloudinary config
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const app = express();
-const PORT = process.env.PORT || 5001;
-
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check - MUST be first and simple
-app.get('/health', (req, res) => {
-    res.status(200).send('OK');
-});
+// Health check
+app.get(['/', '/health'], (req, res) => res.status(200).send('OK'));
 
-app.get('/', (req, res) => {
-    res.status(200).send('OK');
-});
+// Helper function to upload images
+async function uploadImages(images, folder) {
+    if (!Array.isArray(images) || images.length === 0) return [];
 
-// Upload images to Cloudinary
-async function uploadImagesToCloudinary(images, folder) {
-    const uploadedUrls = [];
-
-    if (!images || !Array.isArray(images)) {
-        return uploadedUrls;
-    }
-
-    for (const imageData of images) {
+    const uploads = images.map(async (image) => {
         try {
-            let uploadData = imageData;
-            if (typeof imageData === 'string' && !imageData.startsWith('data:')) {
-                uploadData = `data:image/jpeg;base64,${imageData}`;
-            }
-
-            const result = await new Promise((resolve, reject) => {
-                cloudinary.uploader.upload(
-                    uploadData,
-                    {
-                        folder: folder,
-                        resource_type: 'auto',
-                        transformation: [
-                            { width: 800, height: 800, crop: 'limit' },
-                            { quality: 'auto:good' }
-                        ]
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                );
+            const imageData = image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`;
+            const result = await cloudinary.uploader.upload(imageData, {
+                folder,
+                transformation: [
+                    { width: 800, height: 800, crop: 'limit' },
+                    { quality: 'auto:good' }
+                ]
             });
-
-            uploadedUrls.push(result.secure_url);
+            return result.secure_url;
         } catch (error) {
-            console.error('Cloudinary upload error:', error.message);
+            console.error('Image upload failed:', error.message);
+            return null;
         }
-    }
+    });
 
-    return uploadedUrls;
+    const results = await Promise.all(uploads);
+    return results.filter(Boolean); // Remove failed uploads
 }
 
 // Store payment and onboarding data
 app.post('/api/payments/store', async (req, res) => {
-    console.log('🔍 Received payment store request');
-    console.log('📊 Request body:', JSON.stringify(req.body, null, 2));
+    const {
+        orderId, paymentId, amount, currency = 'USD', packageId, packageName,
+        customerEmail, customerName, status, onboardingData
+    } = req.body;
 
-    let client;
-    try {
-        client = await pool.connect();
-    } catch (error) {
-        console.error('Failed to get database client:', error.message);
-        return res.status(500).json({
+    // Validation
+    if (!orderId || !paymentId || !amount || !customerEmail || status !== 'completed') {
+        return res.status(400).json({
             success: false,
-            message: 'Database connection failed'
+            message: 'Missing required payment fields or payment not completed'
         });
     }
 
+    if (!onboardingData?.name || !onboardingData?.email) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing onboarding data (name and email required)'
+        });
+    }
+
+    const client = await pool.connect();
+
     try {
-        const {
-            orderId,
-            paymentId,
-            amount,
-            currency,
-            packageId,
-            packageName,
-            customerEmail,
-            customerName,
-            status,
-            onboardingData
-        } = req.body;
-
-        // Validate required fields
-        if (!orderId || !paymentId || !amount || !customerEmail || status !== 'completed') {
-            return res.status(400).json({
-                success: false,
-                message: 'Missing required fields or payment not completed'
-            });
-        }
-
-        if (!onboardingData || !onboardingData.name || !onboardingData.email) {
-            return res.status(400).json({
-                success: false,
-                message: 'Missing onboarding data'
-            });
-        }
-
-        // Upload images to Cloudinary
-        const originalPhotoUrls = await uploadImagesToCloudinary(
-            onboardingData.originalPhotos || [],
-            'matchlens-onboarding-photos'
-        );
-
-        const screenshotPhotoUrls = await uploadImagesToCloudinary(
-            onboardingData.screenshotPhotos || [],
-            'matchlens-onboarding-screenshots'
-        );
-
-        // Start transaction
         await client.query('BEGIN');
+
+        // Upload images in parallel
+        const [originalUrls, screenshotUrls] = await Promise.all([
+            uploadImages(onboardingData.originalPhotos || [], 'matchlens-onboarding-photos'),
+            uploadImages(onboardingData.screenshotPhotos || [], 'matchlens-onboarding-screenshots')
+        ]);
 
         // Insert onboarding data
         const onboardingResult = await client.query(`
@@ -165,8 +120,8 @@ app.post('/api/payments/store', async (req, res) => {
             onboardingData.email,
             onboardingData.phone || '',
             onboardingData.weeklyTips || false,
-            JSON.stringify(originalPhotoUrls),
-            JSON.stringify(screenshotPhotoUrls)
+            JSON.stringify(originalUrls),
+            JSON.stringify(screenshotUrls)
         ]);
 
         const userId = onboardingResult.rows[0].user_id;
@@ -179,35 +134,25 @@ app.post('/api/payments/store', async (req, res) => {
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING payment_id
         `, [
-            userId,
-            orderId,
-            paymentId,
-            amount,
-            currency || 'USD',
-            packageId,
-            packageName,
-            customerEmail,
-            customerName,
-            status
+            userId, orderId, paymentId, amount, currency, packageId,
+            packageName, customerEmail, customerName, status
         ]);
 
-        // Commit transaction
         await client.query('COMMIT');
 
         res.json({
             success: true,
             message: 'Data stored successfully',
-            userId: userId,
+            userId,
             paymentId: paymentResult.rows[0].payment_id
         });
 
     } catch (error) {
         await client.query('ROLLBACK');
-        console.error('Error storing data:', error.message);
+        console.error('Store payment error:', error.message);
         res.status(500).json({
             success: false,
-            message: 'Failed to store data',
-            error: error.message
+            message: 'Failed to store data'
         });
     } finally {
         client.release();
@@ -219,22 +164,10 @@ app.get('/api/payments/list', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT 
-                p.payment_id,
-                p.user_id,
-                p.order_id,
-                p.paypal_payment_id,
-                p.amount,
-                p.currency,
-                p.package_id,
-                p.package_name,
-                p.customer_email,
-                p.customer_name,
-                p.status,
+                p.payment_id, p.user_id, p.order_id, p.amount, p.currency,
+                p.package_name, p.customer_email, p.customer_name, p.status,
                 p.created_at as payment_created_at,
-                o.name,
-                o.age,
-                o.email,
-                o.dating_goal
+                o.name, o.age, o.email, o.dating_goal
             FROM payments p
             JOIN onboarding_submissions o ON p.user_id = o.user_id
             ORDER BY p.created_at DESC 
@@ -247,132 +180,58 @@ app.get('/api/payments/list', async (req, res) => {
             count: result.rows.length
         });
     } catch (error) {
-        console.error('Error fetching payments:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch payments'
-        });
+        console.error('List payments error:', error.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch payments' });
     }
 });
 
 // Get payment by order ID
 app.get('/api/payments/order/:orderId', async (req, res) => {
     try {
-        const { orderId } = req.params;
-
         const result = await pool.query(`
             SELECT 
-                p.payment_id,
-                p.user_id,
-                p.order_id,
-                p.paypal_payment_id,
-                p.amount,
-                p.currency,
-                p.package_id,
-                p.package_name,
-                p.customer_email,
-                p.customer_name,
-                p.status,
-                p.created_at as payment_created_at,
-                o.name,
-                o.age,
-                o.dating_goal,
-                o.current_matches,
-                o.body_type,
-                o.style_preference,
-                o.ethnicity,
-                o.interests,
-                o.current_bio,
-                o.phone,
-                o.weekly_tips,
-                o.original_photos,
-                o.screenshot_photos,
+                p.*, o.name, o.age, o.dating_goal, o.current_matches, o.body_type,
+                o.style_preference, o.ethnicity, o.interests, o.current_bio,
+                o.phone, o.weekly_tips, o.original_photos, o.screenshot_photos,
                 o.created_at as onboarding_created_at
             FROM payments p
             JOIN onboarding_submissions o ON p.user_id = o.user_id
             WHERE p.order_id = $1
-        `, [orderId]);
+        `, [req.params.orderId]);
 
         if (result.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'Payment not found'
-            });
+            return res.status(404).json({ success: false, message: 'Payment not found' });
         }
 
-        res.json({
-            success: true,
-            payment: result.rows[0]
-        });
+        res.json({ success: true, payment: result.rows[0] });
     } catch (error) {
-        console.error('Error fetching payment:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch payment'
-        });
+        console.error('Get payment error:', error.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch payment' });
     }
 });
 
-// Error handling
+// Global error handler
 app.use((error, req, res, next) => {
-    console.error('Server error:', error.message);
-    res.status(500).json({
-        success: false,
-        message: 'Internal server error'
-    });
+    console.error('Unhandled error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
 // 404 handler
 app.use('*', (req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Endpoint not found'
-    });
+    res.status(404).json({ success: false, message: 'Endpoint not found' });
 });
-
-// Test database connection on startup
-async function testDatabaseConnection() {
-    try {
-        const client = await pool.connect();
-        await client.query('SELECT 1');
-        client.release();
-        console.log('Database connection successful');
-    } catch (error) {
-        console.error('Database connection failed:', error.message);
-    }
-}
 
 // Start server
-const server = app.listen(PORT, '0.0.0.0', async () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
-    await testDatabaseConnection();
 });
 
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
+// Graceful shutdown
+const gracefulShutdown = (signal) => {
+    console.log(`${signal} received, shutting down gracefully`);
 
-    // Set a timeout to force exit if graceful shutdown takes too long
-    const forceExit = setTimeout(() => {
-        console.log('Force exiting due to timeout');
-        process.exit(1);
-    }, 10000); // 10 second timeout
-
-    server.close(() => {
-        console.log('HTTP server closed');
-        pool.end(() => {
-            console.log('Database pool closed');
-            clearTimeout(forceExit);
-            process.exit(0);
-        });
-    });
-});
-
-process.on('SIGINT', () => {
-    console.log('SIGINT received, shutting down gracefully');
-
-    const forceExit = setTimeout(() => {
-        console.log('Force exiting due to timeout');
+    const timeout = setTimeout(() => {
+        console.log('Force exit timeout reached');
         process.exit(1);
     }, 10000);
 
@@ -380,8 +239,11 @@ process.on('SIGINT', () => {
         console.log('HTTP server closed');
         pool.end(() => {
             console.log('Database pool closed');
-            clearTimeout(forceExit);
+            clearTimeout(timeout);
             process.exit(0);
         });
     });
-});
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
