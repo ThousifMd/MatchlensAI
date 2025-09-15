@@ -133,7 +133,7 @@ export default function SimplePayPalCheckout({ selectedPackage, showNotification
             console.log("Sending payment data to backend:", paymentData);
             console.log("🔍 Frontend is about to call /api/payments/store");
 
-            const paymentResponse = await fetch('/api/payments/store', {
+            const paymentResponse = await fetch('https://efficient-cooperation-production-a90a.up.railway.app/api/payments/store', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
