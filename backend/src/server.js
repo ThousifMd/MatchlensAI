@@ -155,7 +155,7 @@ app.post('/api/payments/store', async (req, res) => {
             message: 'Failed to store data'
         });
     } finally {
-        client.release();
+        //client.release();
     }
 });
 
