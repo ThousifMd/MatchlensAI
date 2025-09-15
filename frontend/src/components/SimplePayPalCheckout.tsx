@@ -131,6 +131,7 @@ export default function SimplePayPalCheckout({ selectedPackage, showNotification
             };
 
             console.log("Sending payment data to backend:", paymentData);
+            console.log("🔍 Frontend is about to call /api/payments/store");
 
             const paymentResponse = await fetch('/api/payments/store', {
                 method: 'POST',
@@ -140,12 +141,17 @@ export default function SimplePayPalCheckout({ selectedPackage, showNotification
                 body: JSON.stringify(paymentData)
             });
 
+            console.log("📊 Payment response status:", paymentResponse.status);
+            console.log("📊 Payment response ok:", paymentResponse.ok);
+
             if (!paymentResponse.ok) {
-                throw new Error(`Failed to store payment: ${paymentResponse.statusText}`);
+                const errorText = await paymentResponse.text();
+                console.error("❌ Payment response error:", errorText);
+                throw new Error(`Failed to store payment: ${paymentResponse.statusText} - ${errorText}`);
             }
 
             const paymentResult = await paymentResponse.json();
-            console.log("Payment stored successfully:", paymentResult);
+            console.log("✅ Payment stored successfully:", paymentResult);
 
             // Clear stored data after successful payment
             localStorage.removeItem('onboardingFormData');
