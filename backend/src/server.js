@@ -13,7 +13,7 @@ const pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     ssl: process.env.DB_HOST && process.env.DB_HOST.includes('digitalocean') ? { rejectUnauthorized: false } : false,
-    max: 10,
+    max: 5,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000,
 });
@@ -33,19 +33,19 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check - Railway needs this
+// Health check - MUST be first and simple
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+    res.status(200).send('OK');
 });
 
 app.get('/', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+    res.status(200).send('OK');
 });
 
 // Upload images to Cloudinary
 async function uploadImagesToCloudinary(images, folder) {
     const uploadedUrls = [];
-
+    
     if (!images || !Array.isArray(images)) {
         return uploadedUrls;
     }
@@ -87,7 +87,7 @@ async function uploadImagesToCloudinary(images, folder) {
 // Store payment and onboarding data
 app.post('/api/payments/store', async (req, res) => {
     const client = await pool.connect();
-
+    
     try {
         const {
             orderId,
@@ -122,7 +122,7 @@ app.post('/api/payments/store', async (req, res) => {
             onboardingData.originalPhotos || [],
             'matchlens-onboarding-photos'
         );
-
+        
         const screenshotPhotoUrls = await uploadImagesToCloudinary(
             onboardingData.screenshotPhotos || [],
             'matchlens-onboarding-screenshots'
@@ -246,7 +246,7 @@ app.get('/api/payments/list', async (req, res) => {
 app.get('/api/payments/order/:orderId', async (req, res) => {
     try {
         const { orderId } = req.params;
-
+        
         const result = await pool.query(`
             SELECT 
                 p.payment_id,
@@ -318,23 +318,27 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
 
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully');
-    pool.end(() => {
-        console.log('Database pool closed');
-        process.exit(0);
+    server.close(() => {
+        pool.end(() => {
+            console.log('Database pool closed');
+            process.exit(0);
+        });
     });
 });
 
 process.on('SIGINT', () => {
     console.log('SIGINT received, shutting down gracefully');
-    pool.end(() => {
-        console.log('Database pool closed');
-        process.exit(0);
+    server.close(() => {
+        pool.end(() => {
+            console.log('Database pool closed');
+            process.exit(0);
+        });
     });
 });
