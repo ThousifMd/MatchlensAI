@@ -5,7 +5,7 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const { testConnection } = require('./config/database');
+// const { testConnection } = require('./config/database');
 
 // Import routes
 const paymentRoutes = require('./routes/payments');
@@ -47,25 +47,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/api/payments', paymentRoutes);
 
-// Health check endpoint
-app.get('/health', async (req, res) => {
-    try {
-        // Simple health check without database dependency
-        res.status(200).json({
-            status: 'OK',
-            timestamp: new Date().toISOString(),
-            environment: process.env.NODE_ENV || 'development',
-            port: PORT,
-            uptime: process.uptime()
-        });
-    } catch (error) {
-        console.error('Health check error:', error);
-        res.status(200).json({
-            status: 'OK',
-            timestamp: new Date().toISOString(),
-            environment: 'fallback'
-        });
-    }
+// Health check endpoint - ultra simple
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK' });
 });
 
 // Database ping endpoint
