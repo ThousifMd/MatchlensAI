@@ -348,13 +348,13 @@ const server = app.listen(PORT, '0.0.0.0', async () => {
 // Handle graceful shutdown
 process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully');
-    
+
     // Set a timeout to force exit if graceful shutdown takes too long
     const forceExit = setTimeout(() => {
         console.log('Force exiting due to timeout');
         process.exit(1);
     }, 10000); // 10 second timeout
-    
+
     server.close(() => {
         console.log('HTTP server closed');
         pool.end(() => {
@@ -367,12 +367,12 @@ process.on('SIGTERM', () => {
 
 process.on('SIGINT', () => {
     console.log('SIGINT received, shutting down gracefully');
-    
+
     const forceExit = setTimeout(() => {
         console.log('Force exiting due to timeout');
         process.exit(1);
     }, 10000);
-    
+
     server.close(() => {
         console.log('HTTP server closed');
         pool.end(() => {
