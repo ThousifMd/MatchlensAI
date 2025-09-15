@@ -51,12 +51,17 @@ export async function POST(request: NextRequest) {
 
         console.log('📤 Sending mock payment data:', mockPaymentData);
 
+        console.log('🚀 About to make fetch request to:', `${backendUrl}/api/payments/store`);
+
         const response = await fetch(`${backendUrl}/api/payments/store`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(mockPaymentData),
+        }).catch(error => {
+            console.error('❌ Fetch error details:', error);
+            throw new Error(`Fetch failed: ${error.message}`);
         });
 
         console.log('📊 Backend response status:', response.status);
