@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     console.log('🔄 Proxying payment data to backend:', paymentData);
 
     const apiBase = process.env.BACKEND_BASE_URL || 'http://localhost:5001';
-    
+
     // Debug: Log all environment variables
     console.log('🔍 Environment variables:', {
       NODE_ENV: process.env.NODE_ENV,

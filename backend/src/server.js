@@ -89,7 +89,7 @@ async function uploadImagesToCloudinary(images, folder) {
 app.post('/api/payments/store', async (req, res) => {
     console.log('🔍 Received payment store request');
     console.log('📊 Request body:', JSON.stringify(req.body, null, 2));
-    
+
     let client;
     try {
         client = await pool.connect();
